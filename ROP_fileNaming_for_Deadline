@@ -1,0 +1,79 @@
+import hou
+
+
+# Define the new path format
+path_for_archive = "z:/"
+path_for_render_output = ""
+
+
+new_path_format_archive = "{path_for_archive}{ROPName}.$F4.rs"
+new_path_format_render_output = "{path_for_render_output}{ROPName}.$F4.exr"
+
+# Get the selected nodes in the Houdini network editor
+selected_nodes = hou.selectedNodes()
+
+# Iterate through the selected nodes
+for node in selected_nodes:
+    # Check if the node is a Redshift ROP
+    if node.type().name() == 'Redshift_ROP':  # Replace 'Redshift_ROP' with the actual Redshift ROP type name if different
+        # Get the ROP node name
+        rop_name = node.name()
+
+        # Set the new RS_archive_file path
+        #new_path = new_path_format_archive.replace("{ROPName}", rop_name)
+        new_path = new_path_format_archive.format(ROPName=rop_name, path_for_archive = path_for_archive)
+        new_path_file = new_path_format_render_output.format(ROPName=rop_name, path_for_render_output = path_for_render_output)
+        
+
+        # Check if the 'RS_archive_file' parameter exists
+        if not path_for_archive=="":
+            if node.parm('RS_archive_file'):
+                node.parm('RS_archive_file').set(new_path)
+                print(f'Set RS_archive_file for {rop_name} to: {new_path}')
+            else:
+                print(f'RS_archive_file parameter not found on {rop_name}')
+
+        if not path_for_render_output == "":
+            if node.parm('RS_outputFileNamePrefix'):
+                node.parm('RS_outputFileNamePrefix').set(new_path_file)
+                print(f'Set RS_outputFileNamePrefix for {rop_name} to: {new_path_file}')
+            else:
+                print(f'RS_outputFileNamePrefix parameter not found on {rop_name}')
+    else:
+        print(f'{node.name()} is not a Redshift ROP node.')
+
+
+
+"""
+import hou
+
+
+# Define the new path format
+path_for_archive = ""
+path_for_render_output = ""
+new_path_format_archive = "{path_for_archive}{ROPName}.$F4.rs"
+
+# Get the selected nodes in the Houdini network editor
+selected_nodes = hou.selectedNodes()
+
+# Iterate through the selected nodes
+for node in selected_nodes:
+    # Check if the node is a Redshift ROP
+    if node.type().name() == 'Redshift_ROP':  # Replace 'Redshift_ROP' with the actual Redshift ROP type name if different
+        # Get the ROP node name
+        rop_name = node.name()
+
+        # Set the new RS_archive_file path
+        #new_path = new_path_format_archive.replace("{ROPName}", rop_name)
+        new_path = new_path_format_archive.format(ROPName=rop_name, path_for_archive = path_for_archive)
+        
+
+        # Check if the 'RS_archive_file' parameter exists
+        if not path_for_archive=="":
+            if node.parm('RS_archive_file'):
+                node.parm('RS_archive_file').set(new_path)
+                print(f'Set RS_archive_file for {rop_name} to: {new_path}')
+            else:
+                print(f'RS_archive_file parameter not found on {rop_name}')
+    else:
+        print(f'{node.name()} is not a Redshift ROP node.')
